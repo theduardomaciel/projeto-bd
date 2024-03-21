@@ -12,8 +12,6 @@
 
 Um aplicativo CRUD para gerenciamento de dados no Banco de Dados Redis, desenvolvido como projeto para a disciplina de Banco de Dados por estudantes do curso de Ciência da Computação.
 
-#### 🧭 Inicialmente Disponível para Terminal
-
 <br />
 
 ## ✨ Tecnologias
@@ -35,13 +33,15 @@ Um aplicativo CRUD para gerenciamento de dados no Banco de Dados Redis, desenvol
 
 ## 🔧 Instalação
 
-1. Clone o repositório:
+1. Instale o Redis em seu sistema operacional seguindo a documentação oficial: https://redis.io/docs/install/
+
+2. Clone o repositório:
 
 ```bash
 git clone https://github.com/theduardomaciel/projeto-bd.git
 ```
 
-2. Navegue até a pasta do projeto
+3. Navegue até a pasta do projeto
 
 ```bash
 cd projeto-bd
@@ -49,13 +49,13 @@ cd projeto-bd
 
 > 🧰 Recomenda-se a criação de um ambiente virtual Python (venv) para o projeto. Caso não seja de seu interesse, ignore os passos 3 e 4.
 
-3. Crie um ambiente virtual usando o comando:
+4. Crie um ambiente virtual usando o comando:
 
 ```bash
 python3 -m venv [nome do ambiente de desenvolvimento]
 ```
 
-4. Ative o ambiente virtual:
+5. Ative o ambiente virtual:
 
 - No Linux:
   ```
@@ -66,14 +66,16 @@ python3 -m venv [nome do ambiente de desenvolvimento]
   .\venv\Scripts\Activate.ps1
   ```
 
-5. Instale as dependências do projeto:
+6. Instale as dependências do projeto:
 
 ```bash
 pip install -r requirements.txt
 ```
 
 > [!NOTE]
-> Caso uma dependência seja adicionada ao projeto, utilize `pip freeze > requirements.txt` para adicioná-la ao arquivo `requirements.txt`.
+> Caso uma nova dependência passe a ser utilizada ao projeto, utilize `pip freeze > requirements.txt` para adicioná-la ao arquivo `requirements.txt`.
+
+<br />
 
 ## 🚀 Execução
 
@@ -97,6 +99,12 @@ python3 main.py
 
 ## 🔗 Links úteis
 
+#### Datasets
+
+https://www.kaggle.com/datasets/antonkozyriev/game-recommendations-on-steam (Dataset utilizado)
+https://www.kaggle.com/datasets/kanchana1990/global-news-engagement-on-social-media
+https://www.kaggle.com/datasets/princeiornongu/merged-cc
+
 #### Documentação
 
 - [Documentação oficial do Redis para Python](https://redis.io/docs/connect/clients/python/)
@@ -111,7 +119,3 @@ python3 main.py
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Consulte o arquivo [LICENSE](./LICENSE) para obter mais detalhes.
-
----
-
-Feito com ❤️
