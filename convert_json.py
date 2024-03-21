@@ -1,12 +1,13 @@
 import redis
 from redis.commands.json.path import Path
-import redis.commands.search.aggregation as aggregations
-import redis.commands.search.reducers as reducers
 from redis.commands.search.field import TextField, NumericField, TagField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
-from redis.commands.search.query import NumericFilter, Query
 
 import json
+import configparser
+
+config = configparser.ConfigParser()
+config.read('config.ini')
 
 new_json = []
 json_path = input('Enter the path of the JSON file: ')
@@ -16,64 +17,81 @@ with open(json_path, 'r') as file:
     new_json = json.load(file)
 
 # Agora, conectamos ao Redis
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis(host='localhost', port=6379)
 
-# Agora, vamos carregar os módulos RedisJSON e RediSearch
-r.execute_command('MODULE LOAD', 'modules/redisjson.so')
-r.execute_command('MODULE LOAD', 'modules/redisearch.so')
+# O dataset utilizado é caracterizado por um conjunto de campos que representam os atributos de um jogo na Steam:
+# app_id: int
+# title: string
+# date_release: string
+# win: bool
+# mac: bool
+# linux: bool
+# rating: float
+# positive_ratio: float
+# user_reviews: int
+# price_final: float
+# price_original: float
+# discount: float
+# steam_deck: bool
 
-# Agora, vamos converter o JSON para um documento RedisJSON usando o comando JSON.SET
-r.json_set('data', Path.rootPath(), new_json)
+# Booleans não existem por padrão no RediSearch, então vamos mapeá-los para campos de texto
 
-# The dataset used is made of games following the schema: app_id, title, date_release, win, mac, linux, rating, positive_ratio, user_reviews, price_final, price_original, discount, steam_deck. Everything is a string, but even some of them are string, they are going to be treated as numbers or booleans.
+def map_json():
+    # Iteramos pelas configurações procurando por [field-names]
+    field_names = dict(config.items('field-names'))
 
-# Now, let's create a RediSearch index using the FT.CREATE command
-schema = IndexDefinition(prefix=['game_'])
-schema.add_field(TextField('app_id', sortable=True, no_stem=True))
-schema.add_field(TextField('title', sortable=True))
-schema.add_field(TextField('date_release', sortable=True))
-schema.add_field(NumericField('win', sortable=True))
-schema.add_field(NumericField('mac', sortable=True))
-schema.add_field(NumericField('linux', sortable=True))
-schema.add_field(NumericField('rating', sortable=True))
-schema.add_field(NumericField('positive_ratio', sortable=True))
-schema.add_field(NumericField('user_reviews', sortable=True))
-schema.add_field(NumericField('price_final', sortable=True))
-schema.add_field(NumericField('price_original', sortable=True))
-schema.add_field(NumericField('discount', sortable=True))
-schema.add_field(NumericField('steam_deck', sortable=True))
+    # Agora, vamos mapear os campos do JSON para o schema
+    schema = ()
 
-# Now, let's index the JSON document using the FT.ADD command
-for i, doc in enumerate(new_json):
-    r.ft_add('idx', f'doc_{i}', 1.0, 'FIELDS', 'data', doc)
+    for key in new_json[0]:
+        # Se o campo estiver presente, adicionamos o campo ao schema
+        if key in field_names:
+            if field_names[key] == 'int':
+                schema += (NumericField(f'$.{key}', sortable=True, as_name=key),)
+            elif field_names[key] == 'float':
+                schema += (NumericField(f'$.{key}', sortable=True, as_name=key),)
+            else:
+                schema += (TextField(f'$.{key}', sortable=True, as_name=key),)
 
-# Now, let's search the index using the FT.SEARCH command
-query = Query('name:John')
-query.limit = 0 # We don't need the actual documents, just the count
-result = r.ft_search('idx', query)
-print(result.total_results)
+    """ [
+        TextField('title', weight=5.0),
+        TextField('date_release'),
+        TextField('win'),c
+        TextField('mac'),
+        TextField('linux'),
+        NumericField('rating'),
+        NumericField('positive_ratio'),
+        NumericField('user_reviews'),
+        NumericField('price_final'),
+        NumericField('price_original'),
+        NumericField('discount'),
+        TextField('steam_deck')
+    ] """
 
-# Now, let's aggregate the results using the FT.AGGREGATE command
-query = Query('name:John')
-query.load('name')
-query.group_by('@city', reducers.count())
-result = r.ft_aggregate('idx', query)
-print(result)
+    return schema
 
-# Now, let's delete the index using the FT.DROPINDEX command
-r.ft_dropindex('idx')
+schema = map_json()
 
-# Now, let's delete the JSON document using the DEL command
-r.delete('data')
+schema2 = (
+    TextField("$.name", as_name="name"), 
+    TagField("$.city", as_name="city"), 
+    NumericField("$.age", as_name="age")
+)
 
-# Now, let's delete the JSON file
-os.remove('data.json')
+print(schema)
+print(schema2)
 
-# Now, let's delete the CSV file
-os.remove('data.csv')
+# Agora, vamos criar o índice
+rs = r.ft('idx:test')
 
-# Now, let's delete the RedisJSON module
-r.execute_command('MODULE UNLOAD', 'RedisJSON')
+rs.create_index(
+    schema2, 
+    definition=IndexDefinition(
+        prefix=['tested:'], index_type=IndexType.JSON
+    )
+)
 
-# Now, let's delete the RediSearch module
-r.execute_command('MODULE UNLOAD', 'RediSearch')
+
+# Agora, vamos indexar o documento JSON
+for i, game in enumerate(new_json):
+    r.json().set(f'game:{i}', Path.root_path(), game)

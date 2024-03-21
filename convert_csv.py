@@ -26,8 +26,9 @@ with open(csv_path, 'r') as file:
                     row[key] = int(row[key])
                 elif field_names[key] == 'float':
                     row[key] = float(row[key])
-                elif field_names[key] == 'bool':
-                    row[key] = bool(row[key])
+                # Removemos a conversão para booleano temporariamente, pois, por padrão, o RedisJSON não suporta esse tipo de dado
+                """ elif field_names[key] == 'bool':
+                    row[key] = bool(row[key]) """
 
         new_json.append(row)
 

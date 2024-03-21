@@ -31,9 +31,16 @@ Um aplicativo CRUD para gerenciamento de dados no Banco de Dados Redis, desenvol
 
 <br />
 
-## 🔧 Instalação
+## 🔧 Configuração do Redis
 
-1. Instale o Redis em seu sistema operacional seguindo a documentação oficial: https://redis.io/docs/install/
+Para a instalação do Redis compatível com o projeto, é possível tomar dois caminhos:
+
+1. Instalação do Redis Stack (já vem com os pacotes utilizados pré-instalados)
+2. É necessário instalar e conectar os pacotes necessários
+
+### Redis Stack
+
+1. Instale o Redis Stack em seu sistema operacional seguindo a documentação oficial: https://redis.io/docs/install/install-stack/
 
 2. Clone o repositório:
 
@@ -47,15 +54,111 @@ git clone https://github.com/theduardomaciel/projeto-bd.git
 cd projeto-bd
 ```
 
-> 🧰 Recomenda-se a criação de um ambiente virtual Python (venv) para o projeto. Caso não seja de seu interesse, ignore os passos 3 e 4.
+#### Execução do servidor
 
-4. Crie um ambiente virtual usando o comando:
+- Agora, para executar o projeto, utilize o seguinte comando:
+  ```bash
+  redis-server
+  ```
+
+### Redis Padrão
+
+1. Instale o Redis em seu sistema operacional seguindo a documentação oficial: https://redis.io/docs/install/install-redis/
+
+2. Clone o repositório:
+
+```bash
+git clone https://github.com/theduardomaciel/projeto-bd.git
+```
+
+3. Navegue até a pasta do projeto
+
+```bash
+cd projeto-bd
+```
+
+4. Instale os pacotes necessários. Para esse projeto, utilizamos os pacotes RedisJSON e RediSearch, que podem ser instalados de diversas maneiras.  
+   Em razão de problemas de compatibilidade com o sistema operacional utilizado pela equipe (Debian 12 Bookworm), foi necessário compilar o pacote da origem (source).  
+   Para reproduzir o que fizemos, caso se encontre na mesma versão do sistema, você pode seguir os seguintes passos:
+
+   > Caso seu sistema operacional não seja Linux, [siga a documentação oficial](https://redis.io/docs/data-types/json/#run-with-docker) para os passos de instalação.
+
+   - [Instale o Rust](https://www.rust-lang.org/tools/install) em sua máquina
+   - Crie uma pasta `\packages` dentro do repositório local do projeto
+
+   #### RedisJSON
+
+   - Clone o [repositório do RedisJSON](https://github.com/RedisJSON/RedisJSON) nela (certifique-se de incluir a opção `--recursive` para clonar os submódulos corretamente):
+
+     ```bash
+     mkdir packages
+     cd packages
+     ```
+
+     ```bash
+     git clone --recursive https://github.com/RedisJSON/RedisJSON.git
+     cd RedisJSON
+     ```
+
+   - Instale as dependências do RedisJSON:
+
+     ```sh
+     ./sbin/setup
+     ```
+
+   - Construa o pacote:
+
+     ```sh
+     make build
+     ```
+
+   #### RediSearch
+
+   - Faça o mesmo para o pacote RediSearch, [clonando o repositório](https://github.com/RediSearch/RediSearch) na pasta `\packages`\:
+
+     ```bash
+     git clone --recursive https://github.com/RediSearch/RediSearch.git
+     cd RediSearch
+     ```
+
+   - Instale as dependências do RediSearch:
+
+     ```sh
+     ./sbin/setup
+     ```
+
+   - Construa o pacote:
+
+     ```sh
+     make build
+     ```
+
+   #### Execução do servidor
+
+   - Agora, para executar o projeto, utilize o seguinte comando:
+
+     ```bash
+     redis-server --loadmodule packages/RedisJSON/bin/linux-x64-release/target/release/lib --loadmodule
+     ```
+
+<br />
+
+## 🧰 Configuração do Python
+
+> [!IMPORTANT]
+> Caso o Python não esteja instalado em sua máquina, você pode baixá-lo [neste link](https://www.python.org/downloads/).
+
+Para a configuração do projeto em Python, recomenda-se a criação de um ambiente virtual Python (venv) para o projeto (obrigatório em dispositivos Linux)
+
+> Caso não seja de seu interesse, ignore os passos 1 e 2.
+
+1. Crie um ambiente virtual usando o comando:
 
 ```bash
 python3 -m venv [nome do ambiente de desenvolvimento]
 ```
 
-5. Ative o ambiente virtual:
+2. Ative o ambiente virtual:
 
 - No Linux:
   ```
@@ -66,7 +169,7 @@ python3 -m venv [nome do ambiente de desenvolvimento]
   .\venv\Scripts\Activate.ps1
   ```
 
-6. Instale as dependências do projeto:
+3. Instale as dependências do projeto:
 
 ```bash
 pip install -r requirements.txt
@@ -101,9 +204,11 @@ python3 main.py
 
 #### Datasets
 
-https://www.kaggle.com/datasets/antonkozyriev/game-recommendations-on-steam (Dataset utilizado)
-https://www.kaggle.com/datasets/kanchana1990/global-news-engagement-on-social-media
-https://www.kaggle.com/datasets/princeiornongu/merged-cc
+- [Dataset utilizado - Recomendação de jogos no Steam](https://www.kaggle.com/datasets/antonkozyriev/game-recommendations-on-steam)
+- [Engajamento global em notícias ao redor do mundo](https://www.kaggle.com/datasets/kanchana1990/global-news-engagement-on-social-media)
+- [Mudanças de temperatura globais de 1961-2022](https://www.kaggle.com/datasets/princeiornongu/merged-cc)
+
+> Como os _scripts_ de conversão do projeto foram escritos de forma dinâmica, basta alterar os valores no arquivo `config.ini` e realizar as adaptações necessárias em `main.py`.
 
 #### Documentação
 
