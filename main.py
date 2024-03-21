@@ -1,70 +1,87 @@
 import redis
-from redis.commands.search.query import NumericFilter, Query
-import redis.commands.search.aggregation as aggregations
-import redis.commands.search.reducers as reducers
 
-r = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r = redis.Redis(host='localhost', port=6379)
+rs = r.ft("idx:games")
 
-# Now, let's search for games with a rating greater than 90
-query = Query('rating:>90')
-results = r.ft_search('idx', query)
+import crud.read as read
 
-# Now, let's print the results
-print(f'Found {results.total} games with a rating greater than 90:')
-for doc in results.docs:
-    print(doc)
+crud_option = input('Choose a CRUD operation (C)reate, (R)ead, (U)pdate, (D)elete: ').upper()
 
-# Now, let's search for games with a rating greater than 90 and a positive ratio greater than 95
-query = Query('rating:>90 @positive_ratio:>95')
-results = r.ft_search('idx', query)
+if crud_option == 'C':
+    # Create
+    app_id = input('Enter the app ID: ')
+    title = input('Enter the title: ')
+    date_release = input('Enter the release date: ')
+    win = input('Is it available for Windows? (True/False): ')
+    mac = input('Is it available for Mac? (True/False): ')
+    linux = input('Is it available for Linux? (True/False): ')
+    rating = input('Enter the rating: ')
+    positive_ratio = input('Enter the positive ratio: ')
+    user_reviews = input('Enter the number of user reviews: ')
+    price_final = input('Enter the final price: ')
+    price_original = input('Enter the original price: ')
+    discount = input('Enter the discount: ')
+    steam_deck = input('Is it available for Steam Deck? (True/False): ')
+    
+    rs.add_document(
+        app_id=app_id,
+        title=title,
+        date_release=date_release,
+        win=win,
+        mac=mac,
+        linux=linux,
+        rating=rating,
+        positive_ratio=positive_ratio,
+        user_reviews=user_reviews,
+        price_final=price_final,
+        price_original=price_original,
+        discount=discount,
+        steam_deck=steam_deck
+    )
 
-# Now, let's print the results
-print(f'Found {results.total} games with a rating greater than 90 and a positive ratio greater than 95:')
-for doc in results.docs:
-    print(doc)
+elif crud_option == 'R':
+    # Read
+    # Chamamos a função search presente no arquivo crud/search.py
+    read.search(rs)
 
-# Now, let's search for games with a rating greater than 90 and a positive ratio greater than 95, and sort the results by rating in descending order
-query = Query('rating:>90 @positive_ratio:>95')
-query.sort_by('rating', 'DESC')
-results = r.ft_search('idx', query)
+elif crud_option == 'U':
+    # Update
+    app_id = input('Enter the app ID: ')
+    title = input('Enter the title: ')
+    date_release = input('Enter the release date: ')
+    win = input('Is it available for Windows? (True/False): ')
+    mac = input('Is it available for Mac? (True/False): ')
+    linux = input('Is it available for Linux? (True/False): ')
+    rating = input('Enter the rating: ')
+    positive_ratio = input('Enter the positive ratio: ')
+    user_reviews = input('Enter the number of user reviews: ')
+    price_final = input('Enter the final price: ')
+    price_original = input('Enter the original price: ')
+    discount = input('Enter the discount: ')
+    steam_deck = input('Is it available for Steam Deck? (True/False): ')
+    
+    rs.add_document(
+        app_id=app_id,
+        title=title,
+        date_release=date_release,
+        win=win,
+        mac=mac,
+        linux=linux,
+        rating=rating,
+        positive_ratio=positive_ratio,
+        user_reviews=user_reviews,
+        price_final=price_final,
+        price_original=price_original,
+        discount=discount,
+        steam_deck=steam_deck
+    )
 
-# Now, let's print the results
-print(f'Found {results.total} games with a rating greater than 90 and a positive ratio greater than 95, sorted by rating in descending order:')
-for doc in results.docs:
-    print(doc)
+elif crud_option == 'D':
+    # Delete
+    app_id = input('Enter the app ID: ')
+    rs.delete_document(app_id)
 
-# Now, let's search for games with a rating greater than 90 and a positive ratio greater than 95, and sort the results by rating in descending order, and limit the results to 10
-query = Query('rating:>90 @positive_ratio:>95')
-query.sort_by('rating', 'DESC')
-query.limit(0, 10)
-results = r.ft_search('idx', query)
+else:
+    print('Invalid option!')
 
-# Now, let's print the results
-print(f'Found {results.total} games with a rating greater than 90 and a positive ratio greater than 95, sorted by rating in descending order, limited to 10 results:')
-for doc in results.docs:
-    print(doc)
-
-# Now, let's search for games with a rating greater than 90 and a positive ratio greater than 95, and sort the results by rating in descending order, and limit the results to 10, and return only the app_id and title fields
-query = Query('rating:>90 @positive_ratio:>95')
-query.sort_by('rating', 'DESC')
-query.limit(0, 10)
-query.return_fields('app_id', 'title')
-results = r.ft_search('idx', query)
-
-# Now, let's print the results
-print(f'Found {results.total} games with a rating greater than 90 and a positive ratio greater than 95, sorted by rating in descending order, limited to 10 results, returning only the app_id and title fields:')
-for doc in results.docs:
-    print(doc)
-
-# Now, let's search for games with a rating greater than 90 and a positive ratio greater than 95, and sort the results by rating in descending order, and limit the results to 10, and return only the app_id and title fields, and aggregate the results by the win field
-query = Query('rating:>90 @positive_ratio:>95')
-query.sort_by('rating', 'DESC')
-query.limit(0, 10)
-query.return_fields('app_id', 'title')
-query.aggregate_by('win', aggregations.count('win'))
-results = r.ft_search('idx', query)
-
-# Now, let's print the results
-print(f'Found {results.total} games with a rating greater than 90 and a positive ratio greater than 95, sorted by rating in descending order, limited to 10 results, returning only the app_id and title fields, and aggregating the results by the win field:')
-for doc in results.docs:
-    print(doc)
+# Para executar este script, é necessário ter o Redis instalado e rodando na porta 6379

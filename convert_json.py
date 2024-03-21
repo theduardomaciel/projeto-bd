@@ -1,7 +1,8 @@
 import redis
 from redis.commands.json.path import Path
-from redis.commands.search.field import TextField, NumericField, TagField
+from redis.commands.search.field import TagField, NumericField, TextField, VectorField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
+from redis.commands.search.query import Query
 
 import json
 import configparser
@@ -11,30 +12,15 @@ config.read('config.ini')
 
 new_json = []
 json_path = input('Enter the path of the JSON file: ')
+if not json_path:
+    exit("JSON path cannot be empty!")
 
 # Primeiro, lemos o arquivo JSON
 with open(json_path, 'r') as file:
     new_json = json.load(file)
 
 # Agora, conectamos ao Redis
-r = redis.Redis(host='localhost', port=6379)
-
-# O dataset utilizado é caracterizado por um conjunto de campos que representam os atributos de um jogo na Steam:
-# app_id: int
-# title: string
-# date_release: string
-# win: bool
-# mac: bool
-# linux: bool
-# rating: float
-# positive_ratio: float
-# user_reviews: int
-# price_final: float
-# price_original: float
-# discount: float
-# steam_deck: bool
-
-# Booleans não existem por padrão no RediSearch, então vamos mapeá-los para campos de texto
+r = redis.Redis(host="localhost", port=6379, db=0, decode_responses=True)
 
 def map_json():
     # Iteramos pelas configurações procurando por [field-names]
@@ -53,45 +39,33 @@ def map_json():
             else:
                 schema += (TextField(f'$.{key}', sortable=True, as_name=key),)
 
-    """ [
-        TextField('title', weight=5.0),
-        TextField('date_release'),
-        TextField('win'),c
-        TextField('mac'),
-        TextField('linux'),
-        NumericField('rating'),
-        NumericField('positive_ratio'),
-        NumericField('user_reviews'),
-        NumericField('price_final'),
-        NumericField('price_original'),
-        NumericField('discount'),
-        TextField('steam_deck')
-    ] """
-
     return schema
 
 schema = map_json()
 
-schema2 = (
-    TextField("$.name", as_name="name"), 
-    TagField("$.city", as_name="city"), 
-    NumericField("$.age", as_name="age")
-)
-
-print(schema)
-print(schema2)
+index_name = input('Enter the name of the index: ')
+if not index_name:
+    exit("Index name cannot be empty!")
 
 # Agora, vamos criar o índice
-rs = r.ft('idx:test')
+rs = r.ft(index_name)
 
-rs.create_index(
-    schema2, 
-    definition=IndexDefinition(
-        prefix=['tested:'], index_type=IndexType.JSON
-    )
-)
+def create_index(schema):
+    try:
+        rs.create_index(
+            schema,
+            definition=IndexDefinition(
+                prefix=["game:"], index_type=IndexType.JSON
+            )
+        )
+        print('Índice criado com sucesso!')
+    except Exception as e:
+        print('Erro ao criar índice:', e)
 
+create_index(schema)
 
 # Agora, vamos indexar o documento JSON
 for i, game in enumerate(new_json):
     r.json().set(f'game:{i}', Path.root_path(), game)
+
+print('Arquivo JSON indexado no Redis com sucesso!')

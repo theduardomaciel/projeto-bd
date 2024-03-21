@@ -40,7 +40,9 @@ Para a instalação do Redis compatível com o projeto, é possível tomar dois 
 
 ### Redis Stack
 
-1. Instale o Redis Stack em seu sistema operacional seguindo a documentação oficial: https://redis.io/docs/install/install-stack/
+1. Utilize o Redis Stack em seu sistema operacional seguindo a documentação oficial: https://redis.io/docs/install/install-stack/
+
+   > Para dispositivos equipados com o sistema Linux, basta [baixar executar o AppImage disponível aqui](https://redis.io/download/#redis-stack-downloads)
 
 2. Clone o repositório:
 
@@ -83,7 +85,8 @@ cd projeto-bd
 
    > Caso seu sistema operacional não seja Linux, [siga a documentação oficial](https://redis.io/docs/data-types/json/#run-with-docker) para os passos de instalação.
 
-   - [Instale o Rust](https://www.rust-lang.org/tools/install) em sua máquina
+   - [Instale a linguagem Rust](https://www.rust-lang.org/tools/install) em sua máquina
+   - [Instale a linguagem Lua](https://www.lua.org/download.html) em sua máquina
    - Crie uma pasta `\packages` dentro do repositório local do projeto
 
    #### RedisJSON
@@ -114,31 +117,14 @@ cd projeto-bd
 
    #### RediSearch
 
-   - Faça o mesmo para o pacote RediSearch, [clonando o repositório](https://github.com/RediSearch/RediSearch) na pasta `\packages`\:
-
-     ```bash
-     git clone --recursive https://github.com/RediSearch/RediSearch.git
-     cd RediSearch
-     ```
-
-   - Instale as dependências do RediSearch:
-
-     ```sh
-     ./sbin/setup
-     ```
-
-   - Construa o pacote:
-
-     ```sh
-     make build
-     ```
+   - Para o Debian, instale o RediSearch por meio de `sudo apt install redis-redisearch`
 
    #### Execução do servidor
 
    - Agora, para executar o projeto, utilize o seguinte comando:
 
      ```bash
-     redis-server --loadmodule packages/RedisJSON/bin/linux-x64-release/target/release/lib --loadmodule
+     redis-server --loadmodule packages/RedisJSON/bin/linux-x64-release/target/release/librejson.so --loadmodule /usr/lib/redis/modules/redisearch.so
      ```
 
 <br />
