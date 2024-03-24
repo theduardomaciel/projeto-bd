@@ -1,87 +1,41 @@
 import redis
 
-r = redis.Redis(host='localhost', port=6379)
-rs = r.ft("idx:games")
-
+import crud.create as create
 import crud.read as read
+import crud.update as update
+import crud.delete as delete
 
-crud_option = input('Choose a CRUD operation (C)reate, (R)ead, (U)pdate, (D)elete: ').upper()
+redis_index = input('Insira o nome do índice no Redis: ')
 
-if crud_option == 'C':
-    # Create
-    app_id = input('Enter the app ID: ')
-    title = input('Enter the title: ')
-    date_release = input('Enter the release date: ')
-    win = input('Is it available for Windows? (True/False): ')
-    mac = input('Is it available for Mac? (True/False): ')
-    linux = input('Is it available for Linux? (True/False): ')
-    rating = input('Enter the rating: ')
-    positive_ratio = input('Enter the positive ratio: ')
-    user_reviews = input('Enter the number of user reviews: ')
-    price_final = input('Enter the final price: ')
-    price_original = input('Enter the original price: ')
-    discount = input('Enter the discount: ')
-    steam_deck = input('Is it available for Steam Deck? (True/False): ')
-    
-    rs.add_document(
-        app_id=app_id,
-        title=title,
-        date_release=date_release,
-        win=win,
-        mac=mac,
-        linux=linux,
-        rating=rating,
-        positive_ratio=positive_ratio,
-        user_reviews=user_reviews,
-        price_final=price_final,
-        price_original=price_original,
-        discount=discount,
-        steam_deck=steam_deck
-    )
+if not redis_index:
+    exit('O nome do índice não pode ser vazio.')
 
-elif crud_option == 'R':
-    # Read
-    # Chamamos a função search presente no arquivo crud/search.py
-    read.search(rs)
+r = redis.Redis(host='localhost', port=6379)
+rs = r.ft(f"idx:{redis_index}")
 
-elif crud_option == 'U':
-    # Update
-    app_id = input('Enter the app ID: ')
-    title = input('Enter the title: ')
-    date_release = input('Enter the release date: ')
-    win = input('Is it available for Windows? (True/False): ')
-    mac = input('Is it available for Mac? (True/False): ')
-    linux = input('Is it available for Linux? (True/False): ')
-    rating = input('Enter the rating: ')
-    positive_ratio = input('Enter the positive ratio: ')
-    user_reviews = input('Enter the number of user reviews: ')
-    price_final = input('Enter the final price: ')
-    price_original = input('Enter the original price: ')
-    discount = input('Enter the discount: ')
-    steam_deck = input('Is it available for Steam Deck? (True/False): ')
-    
-    rs.add_document(
-        app_id=app_id,
-        title=title,
-        date_release=date_release,
-        win=win,
-        mac=mac,
-        linux=linux,
-        rating=rating,
-        positive_ratio=positive_ratio,
-        user_reviews=user_reviews,
-        price_final=price_final,
-        price_original=price_original,
-        discount=discount,
-        steam_deck=steam_deck
-    )
+crud_option = input('Escolha uma operação CRUD - (C)reate, (R)ead, (U)pdate, (D)elete: ').upper()
 
-elif crud_option == 'D':
-    # Delete
-    app_id = input('Enter the app ID: ')
-    rs.delete_document(app_id)
+def request_input():
+    if crud_option == 'C':
+        # Create
+        # Chamamos a função create presente no arquivo crud/create.py
+        create.create(r)
 
-else:
-    print('Invalid option!')
+    elif crud_option == 'R':
+        # Read
+        # Chamamos a função search presente no arquivo crud/search.py
+        read.search(rs)
 
-# Para executar este script, é necessário ter o Redis instalado e rodando na porta 6379
+    elif crud_option == 'U':
+        # Update
+        # Chamamos a função update presente no arquivo crud/update.py
+        update.update(r)
+
+    elif crud_option == 'D':
+        # Delete
+        # Chamamos a função delete presente no arquivo crud/delete.py
+        delete.delete(r)
+
+    else:
+        print("Uma opção inválida foi escolhida. Por favor, tente novamente.")
+        request_input()

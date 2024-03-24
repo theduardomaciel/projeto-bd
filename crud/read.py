@@ -1,4 +1,3 @@
-import redis
 from redis.commands.search.query import NumericFilter, Query
 import redis.commands.search.aggregation as aggregations
 import redis.commands.search.reducers as reducers

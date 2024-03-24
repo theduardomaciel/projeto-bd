@@ -190,9 +190,13 @@ python3 main.py
 
 #### Datasets
 
-- [Dataset utilizado - Recomendação de jogos no Steam](https://www.kaggle.com/datasets/antonkozyriev/game-recommendations-on-steam)
+- [Dataset utilizado - Mudanças de temperatura globais de 1961-2022](https://www.kaggle.com/datasets/princeiornongu/merged-cc)
+
+  > [!NOTE]
+  > Para acessar o Dataset sem ter passado por um processo de normalização, acesse: https://www.fao.org/faostat/en/#data/ET
+
+- [Recomendação de jogos no Steam](https://www.kaggle.com/datasets/antonkozyriev/game-recommendations-on-steam)
 - [Engajamento global em notícias ao redor do mundo](https://www.kaggle.com/datasets/kanchana1990/global-news-engagement-on-social-media)
-- [Mudanças de temperatura globais de 1961-2022](https://www.kaggle.com/datasets/princeiornongu/merged-cc)
 
 > Como os _scripts_ de conversão do projeto foram escritos de forma dinâmica, basta alterar os valores no arquivo `config.ini` e realizar as adaptações necessárias em `main.py`.
 
