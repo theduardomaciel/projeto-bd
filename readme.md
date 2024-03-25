@@ -171,18 +171,42 @@ pip install -r requirements.txt
 Para executar o projeto, siga os passos abaixo:
 
 1. Certifique-se de estar com o ambiente virtual ativado
+
 2. Caso ainda não esteja, navegue até a pasta do projeto
-3. Execute o arquivo principal do projeto:
 
-```
-python main.py
-```
+3. Inicie o servidor Redis:
 
-ou
+#### Redis Stack
 
-```
-python3 main.py
-```
+1. Caso o arquivo `AppImage` do RedisStack esteja presente em `\packages`, por exemplo, acesse a pasta e o execute
+
+   ```bash
+   cd packages/
+   ```
+
+   ```bash
+   ./redis-stack-server-7.2.0-v9-x86_64.appimage
+   ```
+
+2. Execute o arquivo principal do projeto:
+
+   ```bash
+   python3 main.py # ou python main.py, dependendo de sua versão do Python
+   ```
+
+#### Somente Redis
+
+1. Caso não esteja fazendo uso do RedisStack, inicie o servidor com os módulos necessários
+
+   ```bash
+   redis-server --loadmodule packages/RedisJSON/bin/linux-x64-release/target/release/librejson.so --loadmodule /usr/lib/redis/modules/redisearch.so
+   ```
+
+2. Execute o arquivo principal do projeto:
+
+   ```bash
+   python3 main.py # ou python main.py, dependendo de sua versão do Python
+   ```
 
 <br />
 
@@ -190,7 +214,7 @@ python3 main.py
 
 #### Datasets
 
-- [Dataset utilizado - Mudanças de temperatura globais de 1961-2022](https://www.kaggle.com/datasets/princeiornongu/merged-cc)
+- [Dataset utilizado - Mudanças de temperatura globais entre 1961-2022](https://www.kaggle.com/datasets/princeiornongu/merged-cc)
 
   > [!NOTE]
   > Para acessar o Dataset sem ter passado por um processo de normalização, acesse: https://www.fao.org/faostat/en/#data/ET
@@ -214,3 +238,7 @@ python3 main.py
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Consulte o arquivo [LICENSE](./LICENSE) para obter mais detalhes.
+
+```
+
+```

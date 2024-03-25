@@ -1,8 +1,7 @@
 import redis
 from redis.commands.json.path import Path
-from redis.commands.search.field import TagField, NumericField, TextField, VectorField
+from redis.commands.search.field import NumericField, TextField
 from redis.commands.search.indexDefinition import IndexDefinition, IndexType
-from redis.commands.search.query import Query
 
 import json
 import configparser
@@ -47,15 +46,19 @@ index_name = input('Enter the name of the index: ')
 if not index_name:
     exit("Index name cannot be empty!")
 
+item_name = input('Enter the name of the item: ')
+if not item_name:
+    exit("Item name cannot be empty!")
+
 # Agora, vamos criar o índice
-rs = r.ft(index_name)
+rs = r.ft(f"idx:{index_name}")
 
 def create_index(schema):
     try:
         rs.create_index(
             schema,
             definition=IndexDefinition(
-                prefix=["game:"], index_type=IndexType.JSON
+                prefix=[f"{item_name}:"], index_type=IndexType.JSON
             )
         )
         print('Índice criado com sucesso!')
@@ -65,7 +68,7 @@ def create_index(schema):
 create_index(schema)
 
 # Agora, vamos indexar o documento JSON
-for i, game in enumerate(new_json):
-    r.json().set(f'game:{i}', Path.root_path(), game)
+for i, item in enumerate(new_json):
+    r.json().set(f'{item_name}:{item["iso3"]}', Path.root_path(), item)
 
 print('Arquivo JSON indexado no Redis com sucesso!')
