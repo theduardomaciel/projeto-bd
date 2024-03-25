@@ -238,7 +238,3 @@ Para executar o projeto, siga os passos abaixo:
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Consulte o arquivo [LICENSE](./LICENSE) para obter mais detalhes.
-
-```
-
-```
